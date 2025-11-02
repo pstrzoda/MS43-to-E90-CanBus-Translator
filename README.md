@@ -52,7 +52,7 @@ Teensy Pin | Function           | Connection
 - **0x0A8**: Torque control data (10ms interval)
 - **0x0A9**: Torque limits and status (10ms interval)
 - **0x0AA**: Engine RPM and torque data (10ms interval)
-- **0x1D0**: Engine temperature and status (200ms interval)
+- **0x1D0**: Engine temperature and status (200ms interval) `currently disabled - power steering stops workign once this value is being sent`
 - **0x3B4**: Battery voltage and engine status (4s interval)
 - **0x592**: Error/warning messages (8s interval for active errors)
 
@@ -97,7 +97,6 @@ The built-in LED provides visual system status:
 
 ### Key Parameters (configurable in code)
 ```cpp
-#define MAX_ENGINE_TORQUE 360           // Maximum engine torque (Nm)
 #define OVERHEAT_THRESHOLD 108          // Overheating warning (°C)
 #define SAFE_TEMP_THRESHOLD 90          // Safe temperature (°C)
 #define FAN_ON_TEMP_THRESHOLD 105       // Fan activation (°C)
