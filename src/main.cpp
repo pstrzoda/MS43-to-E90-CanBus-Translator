@@ -634,7 +634,7 @@ void blinkStatusLED() {
   unsigned long currentMillis = millis();
   
   // Different blink patterns based on DME CAN status
-  long blinkInterval;
+  unsigned long blinkInterval;
   if (isDmeCanActive()) {
     // Normal operation - slow blink (1 second on/off)
     blinkInterval = 1000;
@@ -715,7 +715,7 @@ void carCanSend() {
 
 void loop() {
     // Serial.println("KL15: " + String(kl15_input_s) + " OIL: " + String(oil_press_input) + " ALT: " + String(alternator_input));
-  Serial.println("Temp: " + String(s_waterTemp) + " RPM: " + String(RPM_ENG) + " Torque: " + String(s_engineTorque) + " Engine Running: " + String(s_isEngineRunning) + );
+  Serial.println("Temp: " + String(s_waterTemp) + " RPM: " + String(RPM_ENG) + " Torque: " + String(s_engineTorque) + " Engine Running: " + String(s_isEngineRunning));
   dmeCanRead();
   carCanSend();
   controlFan();
