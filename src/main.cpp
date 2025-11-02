@@ -23,7 +23,6 @@ unsigned long previousMillis = 0;  // Store the last time the LED was updated
 const long interval = 1000;  // Interval at which to blink (milliseconds)
 
 
-
 // Loop counters for static frames
 int index0AA = 0;
 int index0A8 = 0;
@@ -238,6 +237,7 @@ void SendMessage1D0();
 void SendMessage592(uint8_t errorCode, bool showError);
 void SendMessage3B4();
 void controlFan();
+bool isDmeCanActive();
 
 // Checksum Calculation
 uint8_t calculateChecksum(uint8_t* data, uint8_t len) {
@@ -321,7 +321,7 @@ void ManageErrorMessages() {
   SetErrorState(0xD5, digitalRead(BATTERY_LIGHT_INPUT) == HIGH && s_isEngineRunning);           // Alternator Failure
 
   // Check for communication failure with DME
-  if (curTime - lastDmeMessageTime > CAN2_TIMEOUT_PERIOD && digitalRead(KL15_INPUT) == LOW) {
+  if (!isDmeCanActive() && digitalRead(KL15_INPUT) == LOW) {
     SetErrorState(0x99, true);  // 0x99 is used for Red Gun Icon indicating communication failure
   } else {
     SetErrorState(0x99, false);  // Clear the error when communication is restored
@@ -345,6 +345,12 @@ void ManageErrorMessages() {
     }
   }
 }
+
+bool isDmeCanActive() {
+  unsigned long curTime = millis();
+  return (curTime - lastDmeMessageTime) <= CAN2_TIMEOUT_PERIOD;
+}
+
 
 // Send CAN Messages
 
@@ -629,7 +635,18 @@ void setup(void) {
 
 void blinkStatusLED() {
   unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= interval) {
+  
+  // Different blink patterns based on DME CAN status
+  long blinkInterval;
+  if (isDmeCanActive()) {
+    // Normal operation - slow blink (1 second on/off)
+    blinkInterval = 1000;
+  } else {
+    // DME CAN error - fast blink (200ms on/off)
+    blinkInterval = 200;
+  }
+  
+  if (currentMillis - previousMillis >= blinkInterval) {
     previousMillis = currentMillis;
     ledState = !ledState;
     digitalWrite(STATUS_LED, ledState ? HIGH : LOW);
@@ -700,12 +717,8 @@ void carCanSend() {
 }
 
 void loop() {
-  uint8_t kl15_input_s = digitalRead(KL15_INPUT) == LOW;
-  uint8_t oil_press_input = digitalRead(OIL_PRESS_LOW_INPUT) == LOW;
-  uint8_t alternator_input = digitalRead(BATTERY_LIGHT_INPUT) == LOW;
-
-  // Serial.println("KL15: " + String(kl15_input_s) + " OIL: " + String(oil_press_input) + " ALT: " + String(alternator_input));
-  Serial.println("Temp: " + String(s_waterTemp) + " RPM: " + String(RPM_ENG) + " Torque: " + String(s_engineTorque) + " Engine Running: " + String(s_isEngineRunning));
+    // Serial.println("KL15: " + String(kl15_input_s) + " OIL: " + String(oil_press_input) + " ALT: " + String(alternator_input));
+  Serial.println("Temp: " + String(s_waterTemp) + " RPM: " + String(RPM_ENG) + " Torque: " + String(s_engineTorque) + " Engine Running: " + String(s_isEngineRunning) + );
   dmeCanRead();
   carCanSend();
   controlFan();
