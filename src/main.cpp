@@ -1,12 +1,9 @@
 #include <FlexCAN_T4.h>
 
 // Constants for Engine and Overheat Thresholds
-#define MAX_ENGINE_TORQUE 360
 #define OVERHEAT_THRESHOLD 108
 
-
-
-  // Overheat warning threshold (in °C)
+// Overheat warning threshold (in °C)
 #define SAFE_TEMP_THRESHOLD 90  // Safe temperature threshold to turn off warning (in °C)
 #define INTERNAL_LED_PIN 13
 #define FAN_CONTROL_PIN 19         // Define the pin for fan control
